@@ -2,8 +2,16 @@ provider "aws" {
 	region = "ap-south-1"
 }
 
+terraform {
+  backend "s3" {
+    bucket = "save-terraform-state-files"
+    key    = "key/terraform.tfstate"
+    region = "ap-south-1"
+  }
+}
+
 resource "aws_ecs_cluster" "test-cluster" {
-  name = "monil-cluster"
+  name = "springboot-accelerator-cluster"
 }
 
 
@@ -20,10 +28,10 @@ resource "aws_ecs_task_definition" "springboot-example2" {
   container_definitions = <<DEFINITION
 [
   {
-    "image": "702620960245.dkr.ecr.ap-south-1.amazonaws.com/monil2311-registry:latest",
+    "image": "702620960245.dkr.ecr.ap-south-1.amazonaws.com/springboot-accelerator-registry:latest",
     "cpu": 512,
     "memory": 1024,
-    "name": "monil2311-springboot-example2",
+    "name": "springboot-accelerator-task-definition",
     "networkMode": "awsvpc",
     "portMappings": [
       {
@@ -48,7 +56,7 @@ resource "aws_ecs_service" "test-service" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    security_groups = [aws_security_group.web-sg-monil.id]
+    security_groups = [aws_security_group.web-security-group-springboot.id]
     subnets          = [aws_subnet.dev-public-1.id,aws_subnet.dev-public-2.id]
     assign_public_ip = true
   }
